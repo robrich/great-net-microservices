@@ -1,0 +1,15 @@
+# downloaded files
+# built files
+bin
+obj
+# user files
+.vs
+*.user
+# temp files
+data/postgres
+# secrets
+# non-prod files
+appSettings.Development.json
+**/launchSettings.json
+Dockerfile
+k8s.yaml

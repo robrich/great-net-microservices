@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: microservices
+  labels:
+    name: microservices
+spec:
+  rules:
+  - http:
+      paths:
+      - pathType: Prefix
+        path: "/products/"
+        backend:
+          serviceName: productcatalog
+          servicePort: 8000
+      - pathType: Prefix
+        path: "/shoppingcart/"
+        backend:
+          serviceName: shoppingcart
+          servicePort: 8000
+      - pathType: Prefix
+        path: "/tax/"
+        backend:
+          serviceName: taxservice
+          servicePort: 8000

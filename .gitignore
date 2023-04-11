@@ -1,0 +1,10 @@
+# downloaded files
+# built files
+bin
+obj
+# user files
+.vs
+*.user
+# temp files
+data/postgres
+# secrets

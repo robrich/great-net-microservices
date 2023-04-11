@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+
+  productcatalog:
+    build: Microservices.ProductCatalog
+    image: productcatalog
+    container_name: productcatalog
+    ports:
+      - "5010:8000"
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+      - SwaggerOn=true
+      - ConnectionStrings__ProductCatalog=Host=postgres;Port=5432;Database=productcatalog;Username=productcatalog;Password=productcatalog
+    networks:
+      - microservices
+
+  shoppingcart:
+    build: Microservices.ShoppingCart
+    image: shoppingcart
+    container_name: shoppingcart
+    ports:
+      - "5000:8000"
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+      - SwaggerOn=true
+      - ConnectionStrings__ShoppingCart=Host=postgres;Port=5432;Database=shoppingcart;Username=shoppingcart;Password=shoppingcart
+      - TaxService=http://taxservice:8000
+    networks:
+      - microservices
+
+  taxservice:
+    build: Microservices.TaxService
+    image: taxservice
+    container_name: taxservice
+    ports:
+      - "5020:8000"
+    environment:
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+      - SwaggerOn=true
+      - TaxRate=0.5
+    networks:
+      - microservices
+
+networks:
+  microservices:
+    driver: bridge

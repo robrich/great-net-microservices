@@ -1,0 +1,48 @@
+version: '3'
+
+services:
+
+  jaeger:
+    image: jaegertracing/opentelemetry-all-in-one
+    container_name: jaeger
+    ports:
+      - 16686:16686 # ui, browse here
+      - 13133:13133 # health check
+      - 4317:4317 # gRPC collector
+      - 4318:4318 # http collector
+      - 6381:6381 # udp compact thrift collector
+    networks:
+      - microservices
+
+  postgres:
+    image: postgres:alpine
+    container_name: postgres
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+      - ./data/postgres-init:/docker-entrypoint-initdb.d
+    networks:
+      - microservices
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres
+    networks:
+      - microservices
+
+networks:
+  microservices:
+    driver: bridge
+
+# Jaeger ports: https://www.jaegertracing.io/docs/1.43/getting-started/
+# OpenTelemetry config: https://opentelemetry.io/docs/reference/specification/sdk-environment-variables/
+# OpenTelemetry env vars: https://github.com/open-telemetry/opentelemetry-dotnet/blob/main/src/OpenTelemetry.Exporter.OpenTelemetryProtocol/README.md

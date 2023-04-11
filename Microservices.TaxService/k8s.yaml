@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: taxservice
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: taxservice
+  template:
+    metadata:
+      labels:
+        app: taxservice
+    spec:
+      containers:
+      - name: taxservice
+        image: taxservice:v0.1
+        ports:
+        - containerPort: 8000
+        env:
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://jaeger:4317
+        - name: TaxRate
+          value: '0.3'
+        resources:
+          limits:
+            memory: 128Mi
+            cpu: 500m
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: taxservice
+spec:
+  selector:
+    app: taxservice
+  ports:
+  - port: 8000
+    targetPort: 8000

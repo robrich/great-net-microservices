@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shoppingcart
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: shoppingcart
+  template:
+    metadata:
+      labels:
+        app: shoppingcart
+    spec:
+      containers:
+      - name: shoppingcart
+        image: shoppingcart:v0.1
+        ports:
+        - containerPort: 8000
+        env:
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://jaeger:4317
+        - name: ConnectionStrings__ShoppingCart
+          valueFrom:
+            secretKeyRef:
+              name: shoppingcart
+              key: dbconnection
+        resources:
+          limits:
+            memory: 128Mi
+            cpu: 500m
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shoppingcart
+spec:
+  selector:
+    app: shoppingcart
+  ports:
+  - port: 8000
+    targetPort: 8000
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: shoppingcart
+type: Opaque
+stringData:
+  dbconnection: <TODO_SET_DB_CONNECTION_STRING>
